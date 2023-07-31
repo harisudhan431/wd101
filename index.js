@@ -1,63 +1,57 @@
-
-document.addEventListener("DOMContentLoaded", function () {
-  // Load previous entries from local storage
-  const savedEntries = JSON.parse(localStorage.getItem("userEntries")) || [];
-  displayEntries(savedEntries);
-});
-
-function addEntry() {
-  const name = document.getElementById("name").value;
-  const email = document.getElementById("email").value;
-  const password = document.getElementById("password").value;
-  const dob = document.getElementById("dob").value;
-  const acceptedTerms = document.getElementById("acceptedTerms").checked;
-
-  if (!isValidEmail(email)) {
-    alert("Invalid email address.");
-    return;
-  }
-
-  const dobDate = new Date(dob);
-  const currentDate = new Date();
-  const age = currentDate.getFullYear() - dobDate.getFullYear();
-  if (age < 18 || age > 55) {
-    alert("Age must be between 18 and 55 years.");
-    return;
-  }
-
-  const entry = {
-    name,
-    email,
-    password,
-    dob,
-    acceptedTerms,
+const retriveEntries = () => {
+    let entries = localStorage.getItem("user-Entries");
+    return entries ? JSON.parse(entries) : [];
   };
-
-  // Save the new entry to local storage
-  const savedEntries = JSON.parse(localStorage.getItem("userEntries")) || [];
-  savedEntries.push(entry);
-  localStorage.setItem("userEntries", JSON.stringify(savedEntries));
-
-  // Display the new entry in the table
-  displayEntries(savedEntries);
-}
-
-function displayEntries(entries) {
-  const tableBody = document.getElementById("tableBody");
-  tableBody.innerHTML = "";
-  entries.forEach(function (entry) {
-    const newRow = tableBody.insertRow();
-    newRow.innerHTML = `
-      <td>${entry.name}</td>
-      <td>${entry.email}</td>
-      <td>${entry.password}</td>
-      <td>${entry.dob}</td>
-      <td>${entry.acceptedTerms ? "Yes" : "No"}</td>
-    `;
-  });
-}
-
-function isValidEmail(email) {
-  // Implement email validation logic here (regular expression, etc.)
-  return true; // Return true for simplicity in this example
-}
+  
+  let userEntries = retriveEntries();
+  
+  const showEntries = () => {
+    const entries = retriveEntries();
+  
+    const tableEntries = entries
+        .map(
+            (entry) => `<tr>
+                <td style = "padding: 2px 4px">${entry.name}</td>
+                <td style = "padding: 2px 4px">${entry.email}</td>
+                <td style = "padding: 2px 4px">${entry.password}</td>
+                <td style = "padding: 2px 4px">${entry.dob}</td>
+                <td style = "padding: 2px 4px">${entry.acceptedTermsAndConditions}</td>
+            </tr>`
+        )
+        .join("\n");
+  
+    const table = `<table>
+        
+        <tbody>${tableEntries}</tbody>
+    </table>`;
+  
+    let details = document.getElementById("user-entries");
+    details.innerHTML = table;
+  };
+  
+  const saveForm = (event) => {
+    event.preventDefault();
+    const name = document.getElementById("name").value;
+    const email = document.getElementById("email").value;
+    const password = document.getElementById("password").value;
+    const dob = document.getElementById("dob").value;
+    const acceptedTermsAndConditions = document.getElementById("Accepted term").checked;
+  
+    const entry = {
+        name,
+        email,
+        password,
+        dob,
+        acceptedTermsAndConditions,
+    };
+  
+    userEntries.push(entry);
+    localStorage.setItem("user-Entries", JSON.stringify(userEntries));
+    showEntries();
+    userForm.reset();
+  };
+  
+  let userForm = document.getElementById("form");
+  userForm.addEventListener("submit", saveForm);
+  
+  showEntries();
